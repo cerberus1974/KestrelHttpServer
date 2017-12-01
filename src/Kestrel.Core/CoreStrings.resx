@@ -480,4 +480,7 @@
   <data name="ServiceCertificateRequired" xml:space="preserve">
     <value>The server certificate parameter is required.</value>
   </data>
+  <data name="BindingToDefaultAddresses" xml:space="preserve">
+    <value>No listening endpoints were configured. Binding to {address0} and {address1} by default.</value>
+  </data>
 </root>
