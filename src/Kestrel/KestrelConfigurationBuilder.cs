@@ -35,8 +35,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         /// <summary>
         /// Specifies a configuration Action to run when an endpoint with the given name is loaded from configuration.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="configureOptions"></param>
         public KestrelConfigurationBuilder Endpoint(string name, Action<EndpointConfiguration> configureOptions)
         {
             if (string.IsNullOrEmpty(name))
@@ -55,7 +53,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel
 
         /// <summary>
         /// Bind to given IP address and port.
-        /// The callback configures endpoint-specific settings.
         /// </summary>
         public KestrelConfigurationBuilder Endpoint(IPAddress address, int port, Action<ListenOptions> configure)
         {
@@ -74,7 +71,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel
 
         /// <summary>
         /// Bind to given IP address and port.
-        /// The callback configures endpoint-specific settings.
         /// </summary>
         public KestrelConfigurationBuilder Endpoint(IPEndPoint endPoint, Action<ListenOptions> configure)
         {
@@ -150,7 +146,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel
 
         /// <summary>
         /// Bind to given Unix domain socket path.
-        /// Specify callback to configure endpoint-specific settings.
         /// </summary>
         public KestrelConfigurationBuilder UnixSocketEndpoint(string socketPath, Action<ListenOptions> configure)
         {
@@ -182,7 +177,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel
 
         /// <summary>
         /// Open a socket file descriptor.
-        /// The callback configures endpoint-specific settings.
         /// </summary>
         public KestrelConfigurationBuilder HandleEndpoint(ulong handle, Action<ListenOptions> configure)
         {
@@ -246,7 +240,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel
                 if (https && !listenOptions.ConnectionAdapters.Any(f => f.IsHttps))
                 {
                     // It's possible to get here with no cert configured if the default is missing. This will throw.
-                    listenOptions.UseHttps(endpointConfig.Https);
+                    listenOptions.UseHttps(endpointConfig.HttpsOptions);
                 }
 
                 Options.ListenOptions.Add(listenOptions);

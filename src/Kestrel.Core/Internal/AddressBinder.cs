@@ -164,21 +164,21 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
         {
             public async Task BindAsync(AddressBindContext context)
             {
-                var options = ParseAddress(Constants.DefaultServerAddress, out var https);
-                options.KestrelServerOptions = context.ServerOptions;
-                context.ServerOptions.EndpointDefaults(options);
-                await options.BindAsync(context).ConfigureAwait(false);
+                var httpDefault = ParseAddress(Constants.DefaultServerAddress, out var https);
+                httpDefault.KestrelServerOptions = context.ServerOptions;
+                context.ServerOptions.EndpointDefaults(httpDefault);
+                await httpDefault.BindAsync(context).ConfigureAwait(false);
 
                 // Conditional https default, only if a cert is available
-                options = ParseAddress(Constants.DefaultServerHttpsAddress, out https);
-                options.KestrelServerOptions = context.ServerOptions;
-                context.ServerOptions.EndpointDefaults(options);
+                var httpsDefault = ParseAddress(Constants.DefaultServerHttpsAddress, out https);
+                httpsDefault.KestrelServerOptions = context.ServerOptions;
+                context.ServerOptions.EndpointDefaults(httpsDefault);
 
-                if (!options.ConnectionAdapters.Any(f => f.IsHttps))
+                if (!httpsDefault.ConnectionAdapters.Any(f => f.IsHttps))
                 {
                     try
                     {
-                        context.DefaultHttpsProvider.ConfigureHttps(options);
+                        context.DefaultHttpsProvider.ConfigureHttps(httpsDefault);
                     }
                     catch (Exception)
                     {
@@ -190,7 +190,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
 
                 context.Logger.LogDebug(CoreStrings.BindingToDefaultAddresses,
                     Constants.DefaultServerAddress, Constants.DefaultServerHttpsAddress);
-                await options.BindAsync(context).ConfigureAwait(false);
+                await httpsDefault.BindAsync(context).ConfigureAwait(false);
             }
         }
 

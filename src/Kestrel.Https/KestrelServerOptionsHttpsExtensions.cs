@@ -10,10 +10,9 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Https
     public static class KestrelServerOptionsHttpsExtensions
     {
         /// <summary>
-        /// Specifies a configuration Action to run for each newly created https endpoint.
+        /// Specifies a configuration Action to run for each newly created https endpoint. Calling this again will replace
+        /// the prior action.
         /// </summary>
-        /// <param name="serverOptions"></param>
-        /// <param name="configureOptions"></param>
         public static void ConfigureHttpsDefaults(this KestrelServerOptions serverOptions, Action<HttpsConnectionAdapterOptions> configureOptions)
         {
             serverOptions.AdapterData[nameof(ConfigureHttpsDefaults)] = configureOptions;
@@ -22,8 +21,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Https
         /// <summary>
         /// Retrieves the configuration Action specified by ConfigureHttpsDefaults. This method is for infrastructure use only.
         /// </summary>
-        /// <param name="serverOptions"></param>
-        /// <returns></returns>
         public static Action<HttpsConnectionAdapterOptions> GetHttpsDefaults(this KestrelServerOptions serverOptions)
         {
             if (serverOptions.AdapterData.TryGetValue(nameof(ConfigureHttpsDefaults), out var action))
@@ -36,8 +33,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Https
         /// <summary>
         /// Used to override the default certificate for endpoints. This is for infrastructure use only.
         /// </summary>
-        /// <param name="serverOptions"></param>
-        /// <param name="cert"></param>
         public static void OverrideDefaultCertificate(this KestrelServerOptions serverOptions, X509Certificate2 cert)
         {
             serverOptions.AdapterData[nameof(OverrideDefaultCertificate)] = cert;
@@ -46,8 +41,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Https
         /// <summary>
         /// Retrieves the overridden default certificate for applications. This is for infrastructure use only.
         /// </summary>
-        /// <param name="serverOptions"></param>
-        /// <returns></returns>
         public static X509Certificate2 GetOverriddenDefaultCertificate(this KestrelServerOptions serverOptions)
         {
             if (serverOptions.AdapterData.TryGetValue(nameof(OverrideDefaultCertificate), out var cert))

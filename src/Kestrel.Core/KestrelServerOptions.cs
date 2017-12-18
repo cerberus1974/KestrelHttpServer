@@ -74,9 +74,9 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
         public IDictionary<string, object> AdapterData { get; } = new Dictionary<string, object>(0);
 
         /// <summary>
-        /// Specifies a configuration Action to run for each newly created endpoint.
+        /// Specifies a configuration Action to run for each newly created endpoint. Calling this again will replace
+        /// the prior action.
         /// </summary>
-        /// <param name="configureOptions"></param>
         public void ConfigureEndpointDefaults(Action<ListenOptions> configureOptions)
         {
             EndpointDefaults = configureOptions ?? throw new ArgumentNullException(nameof(configureOptions));

@@ -20,14 +20,13 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Https.Internal
             using (var store = new X509Store(storeName, storeLocation))
             {
                 X509Certificate2Collection storeCertificates = null;
-                X509Certificate2Collection foundCertificates = null;
                 X509Certificate2 foundCertificate = null;
 
                 try
                 {
                     store.Open(OpenFlags.ReadOnly);
                     storeCertificates = store.Certificates;
-                    foundCertificates = storeCertificates.Find(X509FindType.FindBySubjectName, subject, !allowInvalid);
+                    var foundCertificates = storeCertificates.Find(X509FindType.FindBySubjectName, subject, !allowInvalid);
                     foundCertificate = foundCertificates
                         .OfType<X509Certificate2>()
                         .Where(IsCertificateAllowedForServerAuth)
@@ -43,14 +42,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Https.Internal
                 }
                 finally
                 {
-                    if (foundCertificate != null)
-                    {
-                        storeCertificates.Remove(foundCertificate);
-                        foundCertificates.Remove(foundCertificate);
-                    }
-
-                    DisposeCertificates(storeCertificates);
-                    DisposeCertificates(foundCertificates);
+                    DisposeCertificates(storeCertificates, except: foundCertificate);
                 }
             }
         }
@@ -89,13 +81,16 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Https.Internal
             return !hasEkuExtension;
         }
 
-        private static void DisposeCertificates(X509Certificate2Collection certificates)
+        private static void DisposeCertificates(X509Certificate2Collection certificates, X509Certificate2 except)
         {
             if (certificates != null)
             {
                 foreach (var certificate in certificates)
                 {
-                    certificate.Dispose();
+                    if (!certificate.Equals(except))
+                    {
+                        certificate.Dispose();
+                    }
                 }
             }
         }

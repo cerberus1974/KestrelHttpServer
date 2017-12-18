@@ -138,21 +138,21 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
             Assert.Equal("http://*:5001", end1.Url);
             Assert.NotNull(end1.ConfigSection);
             Assert.NotNull(end1.Certificate);
-            Assert.False(end1.Certificate.Exists);
+            Assert.False(end1.Certificate.ConfigSection.Exists());
 
             var end2 = endpoints.Skip(1).First();
             Assert.Equal("End2", end2.Name);
             Assert.Equal("https://*:5002", end2.Url);
             Assert.NotNull(end2.ConfigSection);
             Assert.NotNull(end2.Certificate);
-            Assert.False(end2.Certificate.Exists);
+            Assert.False(end2.Certificate.ConfigSection.Exists());
 
             var end3 = endpoints.Skip(2).First();
             Assert.Equal("End3", end3.Name);
             Assert.Equal("https://*:5003", end3.Url);
             Assert.NotNull(end3.ConfigSection);
             Assert.NotNull(end3.Certificate);
-            Assert.True(end3.Certificate.Exists);
+            Assert.True(end3.Certificate.ConfigSection.Exists());
             var cert3 = end3.Certificate;
             Assert.True(cert3.IsFileCert);
             Assert.False(cert3.IsStoreCert);
@@ -164,7 +164,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
             Assert.Equal("https://*:5004", end4.Url);
             Assert.NotNull(end4.ConfigSection);
             Assert.NotNull(end4.Certificate);
-            Assert.True(end4.Certificate.Exists);
+            Assert.True(end4.Certificate.ConfigSection.Exists());
             var cert4 = end4.Certificate;
             Assert.False(cert4.IsFileCert);
             Assert.True(cert4.IsStoreCert);

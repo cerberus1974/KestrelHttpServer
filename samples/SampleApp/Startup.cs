@@ -115,11 +115,11 @@ namespace SampleApp
                         .Configure(context.Configuration.GetSection("Kestrel"))
                         .Endpoint("NamedEndpoint", opt =>
                         {
-                            opt.Listener.Protocols = HttpProtocols.Http1;
+                            opt.ListenOptions.Protocols = HttpProtocols.Http1;
                         })
                         .Endpoint("NamedHttpsEndpoint", opt =>
                         {
-                            opt.Https.SslProtocols = SslProtocols.Tls12;
+                            opt.HttpsOptions.SslProtocols = SslProtocols.Tls12;
                         });
 
                     options.UseSystemd();

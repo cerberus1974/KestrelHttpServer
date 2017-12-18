@@ -15,7 +15,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
         /// <summary>
         /// Adds the https connection adapter using the default certificate. This throws if the certificate is not available.
         /// </summary>
-        /// <param name="listenOptions"></param>
         void ConfigureHttps(ListenOptions listenOptions);
     }
 }

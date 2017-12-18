@@ -13,14 +13,14 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         internal EndpointConfiguration(bool isHttps, ListenOptions listenOptions, HttpsConnectionAdapterOptions httpsOptions, IConfigurationSection configSection)
         {
             IsHttps = isHttps;
-            Listener = listenOptions ?? throw new ArgumentNullException(nameof(listenOptions));
-            Https = httpsOptions ?? throw new ArgumentNullException(nameof(httpsOptions));
+            ListenOptions = listenOptions ?? throw new ArgumentNullException(nameof(listenOptions));
+            HttpsOptions = httpsOptions ?? throw new ArgumentNullException(nameof(httpsOptions));
             ConfigSection = configSection ?? throw new ArgumentNullException(nameof(configSection));
         }
 
         public bool IsHttps { get; }
-        public ListenOptions Listener { get; }
-        public HttpsConnectionAdapterOptions Https { get; }
+        public ListenOptions ListenOptions { get; }
+        public HttpsConnectionAdapterOptions HttpsOptions { get; }
         public IConfigurationSection ConfigSection { get; }
     }
 }

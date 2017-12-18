@@ -150,9 +150,9 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
                 {
                     ran1 = true;
                     Assert.True(opt.IsHttps);
-                    Assert.NotNull(opt.Https.ServerCertificate);
-                    Assert.Equal(ClientCertificateMode.RequireCertificate, opt.Https.ClientCertificateMode);
-                    Assert.False(opt.Listener.NoDelay);
+                    Assert.NotNull(opt.HttpsOptions.ServerCertificate);
+                    Assert.Equal(ClientCertificateMode.RequireCertificate, opt.HttpsOptions.ClientCertificateMode);
+                    Assert.False(opt.ListenOptions.NoDelay);
                 })
                 .LocalhostEndpoint(5002, opt =>
                 {
@@ -195,8 +195,8 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
                 {
                     ran1 = true;
                     Assert.True(opt.IsHttps);
-                    Assert.Equal(ClientCertificateMode.RequireCertificate, opt.Https.ClientCertificateMode);
-                    Assert.False(opt.Listener.NoDelay);
+                    Assert.Equal(ClientCertificateMode.RequireCertificate, opt.HttpsOptions.ClientCertificateMode);
+                    Assert.False(opt.ListenOptions.NoDelay);
                 })
                 .LocalhostEndpoint(5002, opt =>
                 {

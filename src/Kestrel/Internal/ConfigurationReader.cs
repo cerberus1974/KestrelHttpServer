@@ -106,31 +106,30 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
         public CertificateConfig(IConfigurationSection configSection)
         {
             ConfigSection = configSection;
+            ConfigSection.Bind(this);
         }
 
         public IConfigurationSection ConfigSection { get; }
-
-        public bool Exists => ConfigSection.GetChildren().Any();
 
         public string Id => ConfigSection.Key;
 
         // File
         public bool IsFileCert => !string.IsNullOrEmpty(Path);
 
-        public string Path => ConfigSection["Path"];
+        public string Path { get; set; }
 
-        public string Password => ConfigSection["Password"];
+        public string Password { get; set; }
 
         // Cert store
 
         public bool IsStoreCert => !string.IsNullOrEmpty(Subject);
 
-        public string Subject => ConfigSection["Subject"];
+        public string Subject { get; set; }
 
-        public string Store => ConfigSection["Store"];
+        public string Store { get; set; }
 
-        public string Location => ConfigSection["Location"];
+        public string Location { get; set; }
 
-        public bool? AllowInvalid => ConfigSection.GetSection("AllowInvalid").Get<bool?>();
+        public bool? AllowInvalid { get; set; }
     }
 }
