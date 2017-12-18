@@ -8,23 +8,23 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
     public static class KestrelServerOptionsConfigurationExtensions
     {
         /// <summary>
-        /// Creates a configuration builder for setting up Kestrel.
+        /// Creates a configuration loader for setting up Kestrel.
         /// </summary>
-        public static KestrelConfigurationBuilder Configure(this KestrelServerOptions options)
+        public static KestrelConfigurationLoader Configure(this KestrelServerOptions options)
         {
-            var builder = new KestrelConfigurationBuilder(options, new ConfigurationBuilder().Build());
-            options.ConfigurationBuilder = builder;
-            return builder;
+            var loader = new KestrelConfigurationLoader(options, new ConfigurationBuilder().Build());
+            options.ConfigurationLoader = loader;
+            return loader;
         }
 
         /// <summary>
-        /// Creates a configuration builder for setting up Kestrel that takes an IConfiguration as input.
+        /// Creates a configuration loader for setting up Kestrel that takes an IConfiguration as input.
         /// </summary>
-        public static KestrelConfigurationBuilder Configure(this KestrelServerOptions options, IConfiguration config)
+        public static KestrelConfigurationLoader Configure(this KestrelServerOptions options, IConfiguration config)
         {
-            var builder = new KestrelConfigurationBuilder(options, config);
-            options.ConfigurationBuilder = builder;
-            return builder;
+            var loader = new KestrelConfigurationLoader(options, config);
+            options.ConfigurationLoader = loader;
+            return loader;
         }
     }
 }

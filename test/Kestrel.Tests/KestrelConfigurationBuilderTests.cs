@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
             serverOptions.Configure(config)
                 .Endpoint("Found", endpointOptions => found = true)
                 .Endpoint("NotFound", endpointOptions => throw new NotImplementedException())
-                .Build();
+                .Load();
 
             Assert.Single(serverOptions.ListenOptions);
             Assert.Equal(5001, serverOptions.ListenOptions[0].IPEndPoint.Port);
@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
 
             Assert.Empty(serverOptions.ListenOptions);
 
-            serverOptions.ConfigurationBuilder.Build();
+            serverOptions.ConfigurationLoader.Load();
 
             Assert.Single(serverOptions.ListenOptions);
             Assert.Equal(5001, serverOptions.ListenOptions[0].IPEndPoint.Port);
@@ -75,19 +75,19 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
                 .LocalhostEndpoint(5001);
 
             Assert.Empty(serverOptions.ListenOptions);
-            Assert.Equal(builder, serverOptions.ConfigurationBuilder);
+            Assert.Equal(builder, serverOptions.ConfigurationLoader);
 
-            builder.Build();
-
-            Assert.Single(serverOptions.ListenOptions);
-            Assert.Equal(5001, serverOptions.ListenOptions[0].IPEndPoint.Port);
-            Assert.Null(serverOptions.ConfigurationBuilder);
-
-            builder.Build();
+            builder.Load();
 
             Assert.Single(serverOptions.ListenOptions);
             Assert.Equal(5001, serverOptions.ListenOptions[0].IPEndPoint.Port);
-            Assert.Null(serverOptions.ConfigurationBuilder);
+            Assert.Null(serverOptions.ConfigurationLoader);
+
+            builder.Load();
+
+            Assert.Single(serverOptions.ListenOptions);
+            Assert.Equal(5001, serverOptions.ListenOptions[0].IPEndPoint.Port);
+            Assert.Null(serverOptions.ConfigurationLoader);
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
             serverOptions.Configure(config2)
                 .LocalhostEndpoint(5003, endpointOptions => run2 = true);
 
-            serverOptions.ConfigurationBuilder.Build();
+            serverOptions.ConfigurationLoader.Load();
 
             Assert.Equal(2, serverOptions.ListenOptions.Count);
             Assert.Equal(5002, serverOptions.ListenOptions[0].IPEndPoint.Port);
@@ -159,7 +159,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
                     ran2 = true;
                     Assert.False(opt.NoDelay);
                 })
-                .Build();
+                .Load();
 
             Assert.True(ran1);
             Assert.True(ran2);
@@ -203,7 +203,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
                     ran2 = true;
                     Assert.False(opt.NoDelay);
                 })
-                .Build();
+                .Load();
 
             Assert.True(ran1);
             Assert.True(ran2);

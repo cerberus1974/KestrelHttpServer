@@ -17,9 +17,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.Server.Kestrel
 {
-    public class KestrelConfigurationBuilder : IKestrelConfigurationBuilder
+    public class KestrelConfigurationLoader : IKestrelConfigurationLoader
     {
-        internal KestrelConfigurationBuilder(KestrelServerOptions options, IConfiguration configuration)
+        internal KestrelConfigurationLoader(KestrelServerOptions options, IConfiguration configuration)
         {
             Options = options ?? throw new ArgumentNullException(nameof(options));
             Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
@@ -29,13 +29,13 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         public IConfiguration Configuration { get; }
         private IDictionary<string, Action<EndpointConfiguration>> EndpointConfigurations { get; }
             = new Dictionary<string, Action<EndpointConfiguration>>(0);
-        // Actions that will be delayed until Build so that they aren't applied if the configuration builder is replaced.
+        // Actions that will be delayed until Load so that they aren't applied if the configuration loader is replaced.
         private IList<Action> EndpointsToAdd { get; } = new List<Action>();
 
         /// <summary>
         /// Specifies a configuration Action to run when an endpoint with the given name is loaded from configuration.
         /// </summary>
-        public KestrelConfigurationBuilder Endpoint(string name, Action<EndpointConfiguration> configureOptions)
+        public KestrelConfigurationLoader Endpoint(string name, Action<EndpointConfiguration> configureOptions)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -49,12 +49,12 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         /// <summary>
         /// Bind to given IP address and port.
         /// </summary>
-        public KestrelConfigurationBuilder Endpoint(IPAddress address, int port) => Endpoint(address, port, _ => { });
+        public KestrelConfigurationLoader Endpoint(IPAddress address, int port) => Endpoint(address, port, _ => { });
 
         /// <summary>
         /// Bind to given IP address and port.
         /// </summary>
-        public KestrelConfigurationBuilder Endpoint(IPAddress address, int port, Action<ListenOptions> configure)
+        public KestrelConfigurationLoader Endpoint(IPAddress address, int port, Action<ListenOptions> configure)
         {
             if (address == null)
             {
@@ -67,12 +67,12 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         /// <summary>
         /// Bind to given IP endpoint.
         /// </summary>
-        public KestrelConfigurationBuilder Endpoint(IPEndPoint endPoint) => Endpoint(endPoint, _ => { });
+        public KestrelConfigurationLoader Endpoint(IPEndPoint endPoint) => Endpoint(endPoint, _ => { });
 
         /// <summary>
         /// Bind to given IP address and port.
         /// </summary>
-        public KestrelConfigurationBuilder Endpoint(IPEndPoint endPoint, Action<ListenOptions> configure)
+        public KestrelConfigurationLoader Endpoint(IPEndPoint endPoint, Action<ListenOptions> configure)
         {
             if (endPoint == null)
             {
@@ -95,13 +95,13 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         /// Listens on ::1 and 127.0.0.1 with the given port. Requesting a dynamic port by specifying 0 is not supported
         /// for this type of endpoint.
         /// </summary>
-        public KestrelConfigurationBuilder LocalhostEndpoint(int port) => LocalhostEndpoint(port, options => { });
+        public KestrelConfigurationLoader LocalhostEndpoint(int port) => LocalhostEndpoint(port, options => { });
 
         /// <summary>
         /// Listens on ::1 and 127.0.0.1 with the given port. Requesting a dynamic port by specifying 0 is not supported
         /// for this type of endpoint.
         /// </summary>
-        public KestrelConfigurationBuilder LocalhostEndpoint(int port, Action<ListenOptions> configure)
+        public KestrelConfigurationLoader LocalhostEndpoint(int port, Action<ListenOptions> configure)
         {
             if (configure == null)
             {
@@ -119,12 +119,12 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         /// <summary>
         /// Listens on all IPs using IPv6 [::], or IPv4 0.0.0.0 if IPv6 is not supported.
         /// </summary>
-        public KestrelConfigurationBuilder AnyIPEndpoint(int port) => AnyIPEndpoint(port, options => { });
+        public KestrelConfigurationLoader AnyIPEndpoint(int port) => AnyIPEndpoint(port, options => { });
 
         /// <summary>
         /// Listens on all IPs using IPv6 [::], or IPv4 0.0.0.0 if IPv6 is not supported.
         /// </summary>
-        public KestrelConfigurationBuilder AnyIPEndpoint(int port, Action<ListenOptions> configure)
+        public KestrelConfigurationLoader AnyIPEndpoint(int port, Action<ListenOptions> configure)
         {
             if (configure == null)
             {
@@ -142,12 +142,12 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         /// <summary>
         /// Bind to given Unix domain socket path.
         /// </summary>
-        public KestrelConfigurationBuilder UnixSocketEndpoint(string socketPath) => UnixSocketEndpoint(socketPath, _ => { });
+        public KestrelConfigurationLoader UnixSocketEndpoint(string socketPath) => UnixSocketEndpoint(socketPath, _ => { });
 
         /// <summary>
         /// Bind to given Unix domain socket path.
         /// </summary>
-        public KestrelConfigurationBuilder UnixSocketEndpoint(string socketPath, Action<ListenOptions> configure)
+        public KestrelConfigurationLoader UnixSocketEndpoint(string socketPath, Action<ListenOptions> configure)
         {
             if (socketPath == null)
             {
@@ -173,12 +173,12 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         /// <summary>
         /// Open a socket file descriptor.
         /// </summary>
-        public KestrelConfigurationBuilder HandleEndpoint(ulong handle) => HandleEndpoint(handle, _ => { });
+        public KestrelConfigurationLoader HandleEndpoint(ulong handle) => HandleEndpoint(handle, _ => { });
 
         /// <summary>
         /// Open a socket file descriptor.
         /// </summary>
-        public KestrelConfigurationBuilder HandleEndpoint(ulong handle, Action<ListenOptions> configure)
+        public KestrelConfigurationLoader HandleEndpoint(ulong handle, Action<ListenOptions> configure)
         {
             if (configure == null)
             {
@@ -193,14 +193,14 @@ namespace Microsoft.AspNetCore.Server.Kestrel
             return this;
         }
 
-        public void Build()
+        public void Load()
         {
-            if (Options.ConfigurationBuilder == null)
+            if (Options.ConfigurationLoader == null)
             {
-                // The builder has already been built.
+                // The loader has already been run.
                 return;
             }
-            Options.ConfigurationBuilder = null;
+            Options.ConfigurationLoader = null;
 
             var configReader = new ConfigurationReader(Configuration);
 

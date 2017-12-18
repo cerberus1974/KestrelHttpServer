@@ -109,7 +109,7 @@ namespace SampleApp
                         .Configure()
                         .Endpoint(IPAddress.Loopback, basePort + 5)
                         .LocalhostEndpoint(basePort + 6)
-                        .Build();
+                        .Load();
 
                     options
                         .Configure(context.Configuration.GetSection("Kestrel"))
