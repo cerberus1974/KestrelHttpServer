@@ -1718,6 +1718,20 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
         internal static string FormatBindingToDefaultAddresses(object address0, object address1)
             => string.Format(CultureInfo.CurrentCulture, GetString("BindingToDefaultAddresses", "address0", "address1"), address0, address1);
 
+        /// <summary>
+        /// The requested certificate {subject} could not be found in {storeLocation}/{storeName} with AllowInvalid setting: {allowInvalid}.
+        /// </summary>
+        internal static string CertNotFoundInStore
+        {
+            get => GetString("CertNotFoundInStore");
+        }
+
+        /// <summary>
+        /// The requested certificate {subject} could not be found in {storeLocation}/{storeName} with AllowInvalid setting: {allowInvalid}.
+        /// </summary>
+        internal static string FormatCertNotFoundInStore(object subject, object storeLocation, object storeName, object allowInvalid)
+            => string.Format(CultureInfo.CurrentCulture, GetString("CertNotFoundInStore", "subject", "storeLocation", "storeName", "allowInvalid"), subject, storeLocation, storeName, allowInvalid);
+
         private static string GetString(string name, params string[] formatterNames)
         {
             var value = _resourceManager.GetString(name);

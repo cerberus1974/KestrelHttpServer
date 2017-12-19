@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace Microsoft.AspNetCore.Server.Kestrel.Https.Internal
 {
@@ -35,7 +36,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Https.Internal
 
                     if (foundCertificate == null)
                     {
-                        throw new InvalidOperationException(HttpsStrings.FormatCertNotFoundInStore(subject, storeLocation, storeName, allowInvalid));
+                        throw new InvalidOperationException(CoreStrings.FormatCertNotFoundInStore(subject, storeLocation, storeName, allowInvalid));
                     }
 
                     return foundCertificate;
