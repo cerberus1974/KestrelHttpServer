@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Security.Authentication;
@@ -13,10 +12,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace SampleApp
@@ -61,7 +58,10 @@ namespace SampleApp
                 })
                 .UseKestrel((context, options) =>
                 {
-                    ShowConfig(context.Configuration);
+                    if (context.HostingEnvironment.IsDevelopment())
+                    {
+                        ShowConfig(context.Configuration);
+                    }
 
                     var basePort = context.Configuration.GetValue<int?>("BASE_PORT") ?? 5000;
 
@@ -92,18 +92,22 @@ namespace SampleApp
                         listenOptions.UseConnectionLogging();
                     });
 
-                    options.ListenLocalhost(basePort + 2, listenOptions =>
+                    // Only add these samples in dev mode so they don't break the Systemd docker test.
+                    if (context.HostingEnvironment.IsDevelopment())
                     {
-                        // Use default dev cert
-                        listenOptions.UseHttps();
-                    });
+                        options.ListenLocalhost(basePort + 2, listenOptions =>
+                        {
+                            // Use default dev cert
+                            listenOptions.UseHttps();
+                        });
 
-                    options.ListenAnyIP(basePort + 3);
+                        options.ListenAnyIP(basePort + 3);
 
-                    options.ListenAnyIP(basePort + 4, listenOptions =>
-                    {
-                        listenOptions.UseHttps(StoreName.My, "aspnet.test", allowInvalid: true);
-                    });
+                        options.ListenAnyIP(basePort + 4, listenOptions =>
+                        {
+                            listenOptions.UseHttps(StoreName.My, "aspnet.test", allowInvalid: true);
+                        });
+                    }
 
                     options
                         .Configure()
