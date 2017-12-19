@@ -209,16 +209,14 @@ namespace Microsoft.AspNetCore.Server.Kestrel
             foreach (var endpoint in configReader.Endpoints)
             {
                 var listenOptions = AddressBinder.ParseAddress(endpoint.Url, out var https);
-                listenOptions.KestrelServerOptions = Options;
-                Options.EndpointDefaults(listenOptions);
+                Options.ApplyEndpointDefaults(listenOptions);
 
                 // Compare to UseHttps(httpsOptions => { })
                 var httpsOptions = new HttpsConnectionAdapterOptions();
                 if (https)
                 {
                     // Defaults
-                    httpsOptions.ServerCertificate = listenOptions.KestrelServerOptions.DefaultCertificate;
-                    Options.HttpsDefaults(httpsOptions);
+                    Options.ApplyHttpsDefaults(httpsOptions);
 
                     // Specified
                     httpsOptions.ServerCertificate = LoadCertificate(endpoint.Certificate, endpoint.Name)

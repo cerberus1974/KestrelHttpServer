@@ -177,8 +177,7 @@ namespace Microsoft.AspNetCore.Hosting
             }
 
             var options = new HttpsConnectionAdapterOptions();
-            options.ServerCertificate = listenOptions.KestrelServerOptions.DefaultCertificate;
-            listenOptions.KestrelServerOptions.HttpsDefaults(options);
+            listenOptions.KestrelServerOptions.ApplyHttpsDefaults(options);
             configureOptions(options);
 
             if (options.ServerCertificate == null)
@@ -192,8 +191,7 @@ namespace Microsoft.AspNetCore.Hosting
         internal static bool TryUseHttps(this ListenOptions listenOptions)
         {
             var options = new HttpsConnectionAdapterOptions();
-            options.ServerCertificate = listenOptions.KestrelServerOptions.DefaultCertificate;
-            listenOptions.KestrelServerOptions.HttpsDefaults(options);
+            listenOptions.KestrelServerOptions.ApplyHttpsDefaults(options);
 
             if (options.ServerCertificate == null)
             {

@@ -163,14 +163,12 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
             public async Task BindAsync(AddressBindContext context)
             {
                 var httpDefault = ParseAddress(Constants.DefaultServerAddress, out var https);
-                httpDefault.KestrelServerOptions = context.ServerOptions;
-                context.ServerOptions.EndpointDefaults(httpDefault);
+                context.ServerOptions.ApplyEndpointDefaults(httpDefault);
                 await httpDefault.BindAsync(context).ConfigureAwait(false);
 
                 // Conditional https default, only if a cert is available
                 var httpsDefault = ParseAddress(Constants.DefaultServerHttpsAddress, out https);
-                httpsDefault.KestrelServerOptions = context.ServerOptions;
-                context.ServerOptions.EndpointDefaults(httpsDefault);
+                context.ServerOptions.ApplyEndpointDefaults(httpDefault);
 
                 if (httpsDefault.ConnectionAdapters.Any(f => f.IsHttps)
                     || httpsDefault.TryUseHttps())
@@ -254,8 +252,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
                 foreach (var address in _addresses)
                 {
                     var options = ParseAddress(address, out var https);
-                    options.KestrelServerOptions = context.ServerOptions;
-                    context.ServerOptions.EndpointDefaults(options);
+                    context.ServerOptions.ApplyEndpointDefaults(options);
 
                     if (https && !options.ConnectionAdapters.Any(f => f.IsHttps))
                     {

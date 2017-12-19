@@ -67,12 +67,12 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
         /// <summary>
         /// A default configuration action for all endpoints. Use for Listen, configuration, the default url, and URLs.
         /// </summary>
-        internal Action<ListenOptions> EndpointDefaults { get; set; } = _ => { };
+        private Action<ListenOptions> EndpointDefaults { get; set; } = _ => { };
 
         /// <summary>
         /// A default configuration action for all https endpoints.
         /// </summary>
-        internal Action<HttpsConnectionAdapterOptions> HttpsDefaults { get; set; } = _ => { };
+        private Action<HttpsConnectionAdapterOptions> HttpsDefaults { get; set; } = _ => { };
 
         /// <summary>
         /// The default server certificate for https endpoints. This is applied before HttpsDefaults.
@@ -88,6 +88,12 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
             EndpointDefaults = configureOptions ?? throw new ArgumentNullException(nameof(configureOptions));
         }
 
+        internal void ApplyEndpointDefaults(ListenOptions listenOptions)
+        {
+            listenOptions.KestrelServerOptions = this;
+            EndpointDefaults(listenOptions);
+        }
+
         /// <summary>
         /// Specifies a configuration Action to run for each newly created https endpoint. Calling this again will replace
         /// the prior action.
@@ -95,6 +101,12 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
         public void ConfigureHttpsDefaults(Action<HttpsConnectionAdapterOptions> configureOptions)
         {
             HttpsDefaults = configureOptions ?? throw new ArgumentNullException(nameof(configureOptions));
+        }
+
+        internal void ApplyHttpsDefaults(HttpsConnectionAdapterOptions httpsOptions)
+        {
+            httpsOptions.ServerCertificate = DefaultCertificate;
+            HttpsDefaults(httpsOptions);
         }
 
         /// <summary>
@@ -163,8 +175,8 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
                 throw new ArgumentNullException(nameof(configure));
             }
 
-            var listenOptions = new ListenOptions(endPoint) { KestrelServerOptions = this };
-            EndpointDefaults(listenOptions);
+            var listenOptions = new ListenOptions(endPoint);
+            ApplyEndpointDefaults(listenOptions);
             configure(listenOptions);
             ListenOptions.Add(listenOptions);
         }
@@ -186,11 +198,8 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
                 throw new ArgumentNullException(nameof(configure));
             }
 
-            var listenOptions = new LocalhostListenOptions(port)
-            {
-                KestrelServerOptions = this,
-            };
-            EndpointDefaults(listenOptions);
+            var listenOptions = new LocalhostListenOptions(port);
+            ApplyEndpointDefaults(listenOptions);
             configure(listenOptions);
             ListenOptions.Add(listenOptions);
         }
@@ -210,11 +219,8 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
                 throw new ArgumentNullException(nameof(configure));
             }
 
-            var listenOptions = new AnyIPListenOptions(port)
-            {
-                KestrelServerOptions = this,
-            };
-            EndpointDefaults(listenOptions);
+            var listenOptions = new AnyIPListenOptions(port);
+            ApplyEndpointDefaults(listenOptions);
             configure(listenOptions);
             ListenOptions.Add(listenOptions);
         }
@@ -246,8 +252,8 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
                 throw new ArgumentNullException(nameof(configure));
             }
 
-            var listenOptions = new ListenOptions(socketPath) { KestrelServerOptions = this };
-            EndpointDefaults(listenOptions);
+            var listenOptions = new ListenOptions(socketPath);
+            ApplyEndpointDefaults(listenOptions);
             configure(listenOptions);
             ListenOptions.Add(listenOptions);
         }
@@ -271,8 +277,8 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
                 throw new ArgumentNullException(nameof(configure));
             }
 
-            var listenOptions = new ListenOptions(handle) { KestrelServerOptions = this };
-            EndpointDefaults(listenOptions);
+            var listenOptions = new ListenOptions(handle);
+            ApplyEndpointDefaults(listenOptions);
             configure(listenOptions);
             ListenOptions.Add(listenOptions);
         }
