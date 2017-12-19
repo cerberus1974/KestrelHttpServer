@@ -125,6 +125,11 @@ namespace Microsoft.AspNetCore.Hosting
         /// <returns>The <see cref="ListenOptions"/>.</returns>
         public static ListenOptions UseHttps(this ListenOptions listenOptions, X509Certificate2 serverCertificate)
         {
+            if (serverCertificate == null)
+            {
+                throw new ArgumentNullException(nameof(serverCertificate));
+            }
+
             return listenOptions.UseHttps(options =>
             {
                 options.ServerCertificate = serverCertificate;
@@ -141,6 +146,11 @@ namespace Microsoft.AspNetCore.Hosting
         public static ListenOptions UseHttps(this ListenOptions listenOptions, X509Certificate2 serverCertificate,
             Action<HttpsConnectionAdapterOptions> configureOptions)
         {
+            if (serverCertificate == null)
+            {
+                throw new ArgumentNullException(nameof(serverCertificate));
+            }
+
             if (configureOptions == null)
             {
                 throw new ArgumentNullException(nameof(configureOptions));

@@ -332,7 +332,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Tests
 
         private static KestrelServer CreateServer(KestrelServerOptions options, bool throwOnCriticalErrors = true)
         {
-            // TODO: Register IDefaultHttpsProvider service
             return new KestrelServer(Options.Create(options), new MockTransportFactory(), new LoggerFactory(new[] { new KestrelTestLoggerProvider(throwOnCriticalErrors) }));
         }
 
