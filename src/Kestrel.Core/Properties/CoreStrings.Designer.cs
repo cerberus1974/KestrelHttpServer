@@ -1747,18 +1747,18 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
             => string.Format(CultureInfo.CurrentCulture, GetString("EndpointMissingUrl", "endpointName"), endpointName);
 
         /// <summary>
-        /// Unable to configure HTTPS endpoint. Try running 'dotnet developercertificates https -t' to setup a developer certificate for use with localhost. For information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054
+        /// Unable to configure HTTPS endpoint. No server certificate was specified and the default developer certificate could not be found. Try running 'dotnet developercertificates https -t' to setup a developer certificate for use with localhost. For information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054
         /// </summary>
-        internal static string HttpsUrlProvidedButNoDevelopmentCertificateFound
+        internal static string NoCertSpecifiedNoDevelopmentCertificateFound
         {
-            get => GetString("HttpsUrlProvidedButNoDevelopmentCertificateFound");
+            get => GetString("NoCertSpecifiedNoDevelopmentCertificateFound");
         }
 
         /// <summary>
-        /// Unable to configure HTTPS endpoint. Try running 'dotnet developercertificates https -t' to setup a developer certificate for use with localhost. For information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054
+        /// Unable to configure HTTPS endpoint. No server certificate was specified and the default developer certificate could not be found. Try running 'dotnet developercertificates https -t' to setup a developer certificate for use with localhost. For information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054
         /// </summary>
-        internal static string FormatHttpsUrlProvidedButNoDevelopmentCertificateFound()
-            => GetString("HttpsUrlProvidedButNoDevelopmentCertificateFound");
+        internal static string FormatNoCertSpecifiedNoDevelopmentCertificateFound()
+            => GetString("NoCertSpecifiedNoDevelopmentCertificateFound");
 
         /// <summary>
         /// The endpoint {endpointName} specified multiple certificate sources.

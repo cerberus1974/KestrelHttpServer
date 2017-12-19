@@ -172,23 +172,18 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
                 httpsDefault.KestrelServerOptions = context.ServerOptions;
                 context.ServerOptions.EndpointDefaults(httpsDefault);
 
-                if (!httpsDefault.ConnectionAdapters.Any(f => f.IsHttps))
+                if (httpsDefault.ConnectionAdapters.Any(f => f.IsHttps)
+                    || httpsDefault.TryUseHttps())
                 {
-                    try
-                    {
-                        httpsDefault.UseHttps();
-                    }
-                    catch (Exception)
-                    {
-                        // No default cert is available
-                        context.Logger.LogDebug(CoreStrings.BindingToDefaultAddress, Constants.DefaultServerAddress);
-                        return;
-                    }
+                    context.Logger.LogDebug(CoreStrings.BindingToDefaultAddresses,
+                        Constants.DefaultServerAddress, Constants.DefaultServerHttpsAddress);
+                    await httpsDefault.BindAsync(context).ConfigureAwait(false);
                 }
-
-                context.Logger.LogDebug(CoreStrings.BindingToDefaultAddresses,
-                    Constants.DefaultServerAddress, Constants.DefaultServerHttpsAddress);
-                await httpsDefault.BindAsync(context).ConfigureAwait(false);
+                else
+                {
+                    // No default cert is available, do not bind to the https endpoint.
+                    context.Logger.LogDebug(CoreStrings.BindingToDefaultAddress, Constants.DefaultServerAddress);
+                }
             }
         }
 

@@ -89,6 +89,13 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
         }
     }
 
+    // "EndpointName": {
+    //    "Url": "https://*:5463",
+    //    "Certificate": {
+    //        "Path": "testCert.pfx",
+    //        "Password": "testPassword"
+    //    }
+    // }
     internal class EndpointConfig
     {
         public string Name { get; set; }
@@ -110,8 +117,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
         }
 
         public IConfigurationSection ConfigSection { get; }
-
-        public string Id => ConfigSection.Key;
 
         // File
         public bool IsFileCert => !string.IsNullOrEmpty(Path);

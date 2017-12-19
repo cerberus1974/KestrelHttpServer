@@ -19,7 +19,8 @@ namespace Microsoft.AspNetCore.Hosting
     public static class ListenOptionsHttpsExtensions
     {
         /// <summary>
-        /// Configure Kestrel to use HTTPS with the default development certificate.
+        /// Configure Kestrel to use HTTPS with the default certificate if available.
+        /// This will throw if no default certificate is configured.
         /// </summary>
         /// <param name="listenOptions">The <see cref="ListenOptions"/> to configure.</param>
         /// <returns>The <see cref="ListenOptions"/>.</returns>
@@ -75,7 +76,7 @@ namespace Microsoft.AspNetCore.Hosting
         /// <param name="subject">The subject name for the certificate to load.</param>
         /// <returns>The <see cref="ListenOptions"/>.</returns>
         public static ListenOptions UseHttps(this ListenOptions listenOptions, StoreName storeName, string subject)
-            => listenOptions.UseHttps(storeName, subject, StoreLocation.CurrentUser);
+            => listenOptions.UseHttps(storeName, subject, allowInvalid: false);
 
         /// <summary>
         /// Configure Kestrel to use HTTPS.
@@ -83,22 +84,10 @@ namespace Microsoft.AspNetCore.Hosting
         /// <param name="listenOptions">The <see cref="ListenOptions"/> to configure.</param>
         /// <param name="storeName">The certificate store to load the certificate from.</param>
         /// <param name="subject">The subject name for the certificate to load.</param>
-        /// <param name="location">The store location to load the certificate from.</param>
-        /// <returns>The <see cref="ListenOptions"/>.</returns>
-        public static ListenOptions UseHttps(this ListenOptions listenOptions, StoreName storeName, string subject, StoreLocation location)
-            => listenOptions.UseHttps(storeName, subject, location, allowInvalid: false, configureOptions: _ => { });
-
-        /// <summary>
-        /// Configure Kestrel to use HTTPS.
-        /// </summary>
-        /// <param name="listenOptions">The <see cref="ListenOptions"/> to configure.</param>
-        /// <param name="storeName">The certificate store to load the certificate from.</param>
-        /// <param name="subject">The subject name for the certificate to load.</param>
-        /// <param name="location">The store location to load the certificate from.</param>
         /// <param name="allowInvalid">Indicates if invalid certificates should be considered, such as self-signed certificates.</param>
         /// <returns>The <see cref="ListenOptions"/>.</returns>
-        public static ListenOptions UseHttps(this ListenOptions listenOptions, StoreName storeName, string subject, StoreLocation location, bool allowInvalid)
-            => listenOptions.UseHttps(storeName, subject, location, allowInvalid, configureOptions: _ => { });
+        public static ListenOptions UseHttps(this ListenOptions listenOptions, StoreName storeName, string subject, bool allowInvalid)
+            => listenOptions.UseHttps(storeName, subject, allowInvalid, StoreLocation.CurrentUser);
 
         /// <summary>
         /// Configure Kestrel to use HTTPS.
@@ -106,11 +95,23 @@ namespace Microsoft.AspNetCore.Hosting
         /// <param name="listenOptions">The <see cref="ListenOptions"/> to configure.</param>
         /// <param name="storeName">The certificate store to load the certificate from.</param>
         /// <param name="subject">The subject name for the certificate to load.</param>
-        /// <param name="location">The store location to load the certificate from.</param>
         /// <param name="allowInvalid">Indicates if invalid certificates should be considered, such as self-signed certificates.</param>
+        /// <param name="location">The store location to load the certificate from.</param>
+        /// <returns>The <see cref="ListenOptions"/>.</returns>
+        public static ListenOptions UseHttps(this ListenOptions listenOptions, StoreName storeName, string subject, bool allowInvalid, StoreLocation location)
+            => listenOptions.UseHttps(storeName, subject, allowInvalid, location, configureOptions: _ => { });
+
+        /// <summary>
+        /// Configure Kestrel to use HTTPS.
+        /// </summary>
+        /// <param name="listenOptions">The <see cref="ListenOptions"/> to configure.</param>
+        /// <param name="storeName">The certificate store to load the certificate from.</param>
+        /// <param name="subject">The subject name for the certificate to load.</param>
+        /// <param name="allowInvalid">Indicates if invalid certificates should be considered, such as self-signed certificates.</param>
+        /// <param name="location">The store location to load the certificate from.</param>
         /// <param name="configureOptions">An Action to configure the <see cref="HttpsConnectionAdapterOptions"/>.</param>
         /// <returns>The <see cref="ListenOptions"/>.</returns>
-        public static ListenOptions UseHttps(this ListenOptions listenOptions, StoreName storeName, string subject, StoreLocation location, bool allowInvalid,
+        public static ListenOptions UseHttps(this ListenOptions listenOptions, StoreName storeName, string subject, bool allowInvalid, StoreLocation location,
             Action<HttpsConnectionAdapterOptions> configureOptions)
         {
             return listenOptions.UseHttps(CertificateLoader.LoadFromStoreCert(subject, storeName.ToString(), location, allowInvalid), configureOptions);
@@ -170,12 +171,26 @@ namespace Microsoft.AspNetCore.Hosting
             listenOptions.KestrelServerOptions.HttpsDefaults(options);
             configureOptions(options);
 
-            // ConfigureHttpsDefaults may have set the default cert.
             if (options.ServerCertificate == null)
             {
-                throw new InvalidOperationException(CoreStrings.HttpsUrlProvidedButNoDevelopmentCertificateFound);
+                throw new InvalidOperationException(CoreStrings.NoCertSpecifiedNoDevelopmentCertificateFound);
             }
             return listenOptions.UseHttps(options);
+        }
+
+        // Use Https if a default cert is available
+        internal static bool TryUseHttps(this ListenOptions listenOptions)
+        {
+            var options = new HttpsConnectionAdapterOptions();
+            options.ServerCertificate = listenOptions.KestrelServerOptions.DefaultCertificate;
+            listenOptions.KestrelServerOptions.HttpsDefaults(options);
+
+            if (options.ServerCertificate == null)
+            {
+                return false;
+            }
+            listenOptions.UseHttps(options);
+            return true;
         }
 
         /// <summary>

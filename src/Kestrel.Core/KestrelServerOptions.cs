@@ -3,17 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Certificates.Generation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
-using Microsoft.AspNetCore.Server.Kestrel.Internal;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Server.Kestrel.Core
 {
@@ -100,23 +95,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
         public void ConfigureHttpsDefaults(Action<HttpsConnectionAdapterOptions> configureOptions)
         {
             HttpsDefaults = configureOptions ?? throw new ArgumentNullException(nameof(configureOptions));
-        }
-
-        public void UseDefaultDeveloperCertificate()
-        {
-            var certificateManager = new CertificateManager();
-            var certificate = certificateManager.ListCertificates(CertificatePurpose.HTTPS, StoreName.My, StoreLocation.CurrentUser, isValid: true)
-                .FirstOrDefault();
-            var logger = ApplicationServices?.GetService<ILogger<KestrelServer>>();
-            if (certificate != null)
-            {
-                logger?.LocatedDevelopmentCertificate(certificate);
-                DefaultCertificate = certificate;
-            }
-            else
-            {
-                logger?.UnableToLocateDevelopmentCertificate();
-            }
         }
 
         /// <summary>

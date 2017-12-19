@@ -212,6 +212,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel
                 listenOptions.KestrelServerOptions = Options;
                 Options.EndpointDefaults(listenOptions);
 
+                // Compare to UseHttps(httpsOptions => { })
                 var httpsOptions = new HttpsConnectionAdapterOptions();
                 if (https)
                 {
@@ -224,18 +225,21 @@ namespace Microsoft.AspNetCore.Server.Kestrel
                         ?? httpsOptions.ServerCertificate;
                 }
 
-                var endpointConfig = new EndpointConfiguration(https, listenOptions, httpsOptions, endpoint.ConfigSection);
-
                 if (EndpointConfigurations.TryGetValue(endpoint.Name, out var configureEndpoint))
                 {
+                    var endpointConfig = new EndpointConfiguration(https, listenOptions, httpsOptions, endpoint.ConfigSection);
                     configureEndpoint(endpointConfig);
                 }
 
-                // EndpointDefaults or configureEndpoint may have specified an https adapter.
+                // EndpointDefaults or configureEndpoint may have added an https adapter.
                 if (https && !listenOptions.ConnectionAdapters.Any(f => f.IsHttps))
                 {
-                    // It's possible to get here with no cert configured if the default is missing. This will throw.
-                    listenOptions.UseHttps(endpointConfig.HttpsOptions);
+                    if (httpsOptions.ServerCertificate == null)
+                    {
+                        throw new InvalidOperationException(CoreStrings.NoCertSpecifiedNoDevelopmentCertificateFound);
+                    }
+
+                    listenOptions.UseHttps(httpsOptions);
                 }
 
                 Options.ListenOptions.Add(listenOptions);
