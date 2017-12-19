@@ -1732,6 +1732,48 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
         internal static string FormatCertNotFoundInStore(object subject, object storeLocation, object storeName, object allowInvalid)
             => string.Format(CultureInfo.CurrentCulture, GetString("CertNotFoundInStore", "subject", "storeLocation", "storeName", "allowInvalid"), subject, storeLocation, storeName, allowInvalid);
 
+        /// <summary>
+        /// The endpoint {endpointName} is missing the required 'Url' parameter.
+        /// </summary>
+        internal static string EndpointMissingUrl
+        {
+            get => GetString("EndpointMissingUrl");
+        }
+
+        /// <summary>
+        /// The endpoint {endpointName} is missing the required 'Url' parameter.
+        /// </summary>
+        internal static string FormatEndpointMissingUrl(object endpointName)
+            => string.Format(CultureInfo.CurrentCulture, GetString("EndpointMissingUrl", "endpointName"), endpointName);
+
+        /// <summary>
+        /// Unable to configure HTTPS endpoint. Try running 'dotnet developercertificates https -t' to setup a developer certificate for use with localhost. For information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054
+        /// </summary>
+        internal static string HttpsUrlProvidedButNoDevelopmentCertificateFound
+        {
+            get => GetString("HttpsUrlProvidedButNoDevelopmentCertificateFound");
+        }
+
+        /// <summary>
+        /// Unable to configure HTTPS endpoint. Try running 'dotnet developercertificates https -t' to setup a developer certificate for use with localhost. For information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054
+        /// </summary>
+        internal static string FormatHttpsUrlProvidedButNoDevelopmentCertificateFound()
+            => GetString("HttpsUrlProvidedButNoDevelopmentCertificateFound");
+
+        /// <summary>
+        /// The endpoint {endpointName} specified multiple certificate sources.
+        /// </summary>
+        internal static string MultipleCertificateSources
+        {
+            get => GetString("MultipleCertificateSources");
+        }
+
+        /// <summary>
+        /// The endpoint {endpointName} specified multiple certificate sources.
+        /// </summary>
+        internal static string FormatMultipleCertificateSources(object endpointName)
+            => string.Format(CultureInfo.CurrentCulture, GetString("MultipleCertificateSources", "endpointName"), endpointName);
+
         private static string GetString(string name, params string[] formatterNames)
         {
             var value = _resourceManager.GetString(name);

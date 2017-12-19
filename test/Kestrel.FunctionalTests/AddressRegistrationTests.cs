@@ -394,7 +394,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.FunctionalTests
                 {
                     if (mockHttps)
                     {
-                        options.OverrideDefaultCertificate(new X509Certificate2(TestResources.TestCertificatePath, "testPassword"));
+                        options.DefaultCertificate = new X509Certificate2(TestResources.TestCertificatePath, "testPassword");
                     }
                 })
                 .ConfigureLogging(builder => builder

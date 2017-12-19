@@ -74,7 +74,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
                 var url = endpointConfig["Url"];
                 if (string.IsNullOrEmpty(url))
                 {
-                    throw new InvalidOperationException(KestrelStrings.FormatEndpointMissingUrl(endpointConfig.Key));
+                    throw new InvalidOperationException(CoreStrings.FormatEndpointMissingUrl(endpointConfig.Key));
                 }
 
                 var endpoint = new EndpointConfig()

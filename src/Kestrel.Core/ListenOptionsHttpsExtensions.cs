@@ -23,13 +23,8 @@ namespace Microsoft.AspNetCore.Hosting
         /// </summary>
         /// <param name="listenOptions">The <see cref="ListenOptions"/> to configure.</param>
         /// <returns>The <see cref="ListenOptions"/>.</returns>
-        public static ListenOptions UseHttps(this ListenOptions listenOptions)
-        {
-            var httpsProvider = listenOptions.KestrelServerOptions.ApplicationServices.GetRequiredService<IDefaultHttpsProvider>();
-            httpsProvider.ConfigureHttps(listenOptions);
-            return listenOptions;
-        }
-
+        public static ListenOptions UseHttps(this ListenOptions listenOptions) => listenOptions.UseHttps(_ => { });
+ 
         /// <summary>
         /// Configure Kestrel to use HTTPS.
         /// </summary>
@@ -171,9 +166,15 @@ namespace Microsoft.AspNetCore.Hosting
             }
 
             var options = new HttpsConnectionAdapterOptions();
-            options.ServerCertificate = listenOptions.KestrelServerOptions.GetOverriddenDefaultCertificate();
-            listenOptions.KestrelServerOptions.GetHttpsDefaults()(options);
+            options.ServerCertificate = listenOptions.KestrelServerOptions.DefaultCertificate;
+            listenOptions.KestrelServerOptions.HttpsDefaults(options);
             configureOptions(options);
+
+            // ConfigureHttpsDefaults may have set the default cert.
+            if (options.ServerCertificate == null)
+            {
+                throw new InvalidOperationException(CoreStrings.HttpsUrlProvidedButNoDevelopmentCertificateFound);
+            }
             return listenOptions.UseHttps(options);
         }
 

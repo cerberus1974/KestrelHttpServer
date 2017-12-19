@@ -33,7 +33,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.FunctionalTests
             var serverOptions = new KestrelServerOptions();
             serverOptions.ApplicationServices = new ServiceCollection()
                 .AddLogging()
-                .AddSingleton<IDefaultHttpsProvider, DefaultHttpsProvider>()
                 .BuildServiceProvider();
             return serverOptions;
         }
@@ -43,7 +42,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.FunctionalTests
         {
             var serverOptions = CreateServerOptions();
             var defaultCert = new X509Certificate2(TestResources.TestCertificatePath, "testPassword");
-            serverOptions.OverrideDefaultCertificate(defaultCert);
+            serverOptions.DefaultCertificate = defaultCert;
 
             serverOptions.ListenLocalhost(5000, options =>
             {
@@ -64,7 +63,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.FunctionalTests
         {
             var serverOptions = CreateServerOptions();
             var defaultCert = new X509Certificate2(TestResources.TestCertificatePath, "testPassword");
-            serverOptions.OverrideDefaultCertificate(defaultCert);
+            serverOptions.DefaultCertificate = defaultCert;
             serverOptions.ConfigureHttpsDefaults(options =>
             {
                 Assert.Equal(defaultCert, options.ServerCertificate);

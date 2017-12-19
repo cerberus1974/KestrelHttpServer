@@ -17,7 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.Server.Kestrel
 {
-    public class KestrelConfigurationLoader : IKestrelConfigurationLoader
+    public class KestrelConfigurationLoader
     {
         internal KestrelConfigurationLoader(KestrelServerOptions options, IConfiguration configuration)
         {
@@ -216,13 +216,8 @@ namespace Microsoft.AspNetCore.Server.Kestrel
                 if (https)
                 {
                     // Defaults
-                    httpsOptions.ServerCertificate = listenOptions.KestrelServerOptions.GetOverriddenDefaultCertificate();
-                    Options.GetHttpsDefaults()(httpsOptions);
-                    if (httpsOptions.ServerCertificate == null)
-                    {
-                        var provider = Options.ApplicationServices.GetRequiredService<IDefaultHttpsProvider>();
-                        httpsOptions.ServerCertificate = provider.Certificate; // May be null.
-                    }
+                    httpsOptions.ServerCertificate = listenOptions.KestrelServerOptions.DefaultCertificate;
+                    Options.HttpsDefaults(httpsOptions);
 
                     // Specified
                     httpsOptions.ServerCertificate = LoadCertificate(endpoint.Certificate, endpoint.Name)
@@ -259,7 +254,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel
                 var defaultCert = LoadCertificate(defaultCertConfig, "Default");
                 if (defaultCert != null)
                 {
-                    Options.OverrideDefaultCertificate(defaultCert);
+                    Options.DefaultCertificate = defaultCert;
                 }
             }
         }
@@ -268,7 +263,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         {
             if (certInfo.IsFileCert && certInfo.IsStoreCert)
             {
-                throw new InvalidOperationException(KestrelStrings.FormatMultipleCertificateSources(endpointName));
+                throw new InvalidOperationException(CoreStrings.FormatMultipleCertificateSources(endpointName));
             }
             else if (certInfo.IsFileCert)
             {

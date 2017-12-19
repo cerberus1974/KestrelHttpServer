@@ -3,11 +3,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Certificates.Generation;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Server.Kestrel.Core.Internal;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
+using Microsoft.AspNetCore.Server.Kestrel.Internal;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Server.Kestrel.Core
 {
@@ -61,7 +67,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
         /// Provides a configuration source where endpoints will be loaded from on server start.
         /// The default is null.
         /// </summary>
-        public IKestrelConfigurationLoader ConfigurationLoader { get; set; }
+        public KestrelConfigurationLoader ConfigurationLoader { get; set; }
 
         /// <summary>
         /// A default configuration action for all endpoints. Use for Listen, configuration, the default url, and URLs.
@@ -69,9 +75,14 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
         internal Action<ListenOptions> EndpointDefaults { get; set; } = _ => { };
 
         /// <summary>
-        /// Used to flow settings for connection adapters and other extensions.
+        /// A default configuration action for all https endpoints.
         /// </summary>
-        public IDictionary<string, object> AdapterData { get; } = new Dictionary<string, object>(0);
+        internal Action<HttpsConnectionAdapterOptions> HttpsDefaults { get; set; } = _ => { };
+
+        /// <summary>
+        /// The default server certificate for https endpoints. This is applied before HttpsDefaults.
+        /// </summary>
+        internal X509Certificate2 DefaultCertificate { get; set; }
 
         /// <summary>
         /// Specifies a configuration Action to run for each newly created endpoint. Calling this again will replace
@@ -80,6 +91,53 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core
         public void ConfigureEndpointDefaults(Action<ListenOptions> configureOptions)
         {
             EndpointDefaults = configureOptions ?? throw new ArgumentNullException(nameof(configureOptions));
+        }
+
+        /// <summary>
+        /// Specifies a configuration Action to run for each newly created https endpoint. Calling this again will replace
+        /// the prior action.
+        /// </summary>
+        public void ConfigureHttpsDefaults(Action<HttpsConnectionAdapterOptions> configureOptions)
+        {
+            HttpsDefaults = configureOptions ?? throw new ArgumentNullException(nameof(configureOptions));
+        }
+
+        public void UseDefaultDeveloperCertificate()
+        {
+            var certificateManager = new CertificateManager();
+            var certificate = certificateManager.ListCertificates(CertificatePurpose.HTTPS, StoreName.My, StoreLocation.CurrentUser, isValid: true)
+                .FirstOrDefault();
+            var logger = ApplicationServices?.GetService<ILogger<KestrelServer>>();
+            if (certificate != null)
+            {
+                logger?.LocatedDevelopmentCertificate(certificate);
+                DefaultCertificate = certificate;
+            }
+            else
+            {
+                logger?.UnableToLocateDevelopmentCertificate();
+            }
+        }
+
+        /// <summary>
+        /// Creates a configuration loader for setting up Kestrel.
+        /// </summary>
+        public KestrelConfigurationLoader Configure()
+        {
+            var loader = new KestrelConfigurationLoader(this, new ConfigurationBuilder().Build());
+            ConfigurationLoader = loader;
+            return loader;
+        }
+
+        /// <summary>
+        /// Creates a configuration loader for setting up Kestrel that takes an IConfiguration as input.
+        /// This configuration must be scoped to the configuration section for Kestrel.
+        /// </summary>
+        public KestrelConfigurationLoader Configure(IConfiguration config)
+        {
+            var loader = new KestrelConfigurationLoader(this, config);
+            ConfigurationLoader = loader;
+            return loader;
         }
 
         /// <summary>

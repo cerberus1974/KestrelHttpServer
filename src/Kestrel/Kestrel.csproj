@@ -12,8 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="$(MicrosoftAspNetCoreHostingPackageVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.Certificates.Generation.Sources" PrivateAssets="All" Version="$(MicrosoftAspNetCoreCertificatesGenerationSourcesPackageVersion)" />
-    <PackageReference Include="System.Security.Cryptography.Cng" Version="$(SystemSecurityCryptographyCngPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +21,10 @@
     <!-- Even though the Libuv transport is no longer used by default, it remains for back-compat -->
     <ProjectReference Include="..\Kestrel.Transport.Libuv\Kestrel.Transport.Libuv.csproj" />
     <ProjectReference Include="..\Kestrel.Transport.Sockets\Kestrel.Transport.Sockets.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

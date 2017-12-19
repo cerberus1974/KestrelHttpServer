@@ -111,7 +111,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Tests
                 AddressBinder.BindAsync(addresses,
                     options,
                     NullLogger.Instance,
-                    Mock.Of<IDefaultHttpsProvider>(),
                     endpoint => throw new AddressInUseException("already in use")));
         }
 
@@ -132,7 +131,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Tests
             await AddressBinder.BindAsync(addresses,
                 options,
                 logger,
-                Mock.Of<IDefaultHttpsProvider>(),
                 endpoint =>
                 {
                     if (endpoint.IPEndPoint.Address == IPAddress.IPv6Any)

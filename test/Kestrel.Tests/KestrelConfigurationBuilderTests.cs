@@ -24,7 +24,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Tests
             var serverOptions = new KestrelServerOptions();
             serverOptions.ApplicationServices = new ServiceCollection()
                 .AddLogging()
-                .AddSingleton<IDefaultHttpsProvider, DefaultHttpsProvider>()
                 .BuildServiceProvider();
             return serverOptions;
         }
