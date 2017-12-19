@@ -11,7 +11,7 @@ cp -R ~/.dotnet/ $scriptDir
 image=$(docker build -qf $scriptDir/Dockerfile $scriptDir)
 container=$(docker run -Pd $image)
 
-# Try to connect to TestApp once a second up to 10 times via all available ports.
+# Try to connect to SystemdTestApp once a second up to 10 times via all available ports.
 for i in {1..10}; do
     curl -f http://$(docker port $container 8080/tcp) \
     && curl -f http://$(docker port $container 8081/tcp) \
