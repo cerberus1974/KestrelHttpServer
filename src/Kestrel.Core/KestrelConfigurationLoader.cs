@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel
         public KestrelServerOptions Options { get; }
         public IConfiguration Configuration { get; }
         private IDictionary<string, Action<EndpointConfiguration>> EndpointConfigurations { get; }
-            = new Dictionary<string, Action<EndpointConfiguration>>(0);
+            = new Dictionary<string, Action<EndpointConfiguration>>(0, StringComparer.OrdinalIgnoreCase);
         // Actions that will be delayed until Load so that they aren't applied if the configuration loader is replaced.
         private IList<Action> EndpointsToAdd { get; } = new List<Action>();
 
