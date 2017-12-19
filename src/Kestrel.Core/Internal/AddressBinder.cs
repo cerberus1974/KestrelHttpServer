@@ -168,14 +168,14 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
 
                 // Conditional https default, only if a cert is available
                 var httpsDefault = ParseAddress(Constants.DefaultServerHttpsAddress, out https);
-                context.ServerOptions.ApplyEndpointDefaults(httpDefault);
+                context.ServerOptions.ApplyEndpointDefaults(httpsDefault);
 
                 if (httpsDefault.ConnectionAdapters.Any(f => f.IsHttps)
                     || httpsDefault.TryUseHttps())
                 {
+                    await httpsDefault.BindAsync(context).ConfigureAwait(false);
                     context.Logger.LogDebug(CoreStrings.BindingToDefaultAddresses,
                         Constants.DefaultServerAddress, Constants.DefaultServerHttpsAddress);
-                    await httpsDefault.BindAsync(context).ConfigureAwait(false);
                 }
                 else
                 {
